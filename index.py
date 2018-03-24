@@ -1,5 +1,29 @@
-from flask import Flask, jsonify, abort, request
-app = Flask(__name__)
+from flask import Flask, jsonify, abort, request, url_for,make_response
+from flask_httpauth import HTTPBasicAuth
+app = Flask(__name__,static_url_path="")
+
+auth = HTTPBasicAuth()
+
+@auth.get_password
+def get_password(username):
+    if username == 'admin':
+        return 'password'
+    return None
+
+@auth.error_handler
+def unauthorized():
+    return make_response(jsonify({'error': 'Unauthorized access'}), 403)
+
+@app.errorhandler(400)
+def bad_request(error):
+    return make_response(jsonify({'error': 'Bad request'}), 400)
+
+
+@app.errorhandler(404)
+def not_found(error):
+    return make_response(jsonify({'error': 'Not found'}), 404)
+
+
 books = [
     {
         "id":1,
@@ -24,11 +48,20 @@ books = [
     }
     ]
 #get all books
+def make_public_book(books):
+    new_book = {}
+    for field in books:
+        if field == 'id':
+            new_book['uri'] = url_for('get_book', book_id=books['id'], _external=True)
+        else:
+            new_book[field] = books[field]
+    return new_book
+#get all books
 @app.route('/books', methods=['GET'])
-def get_books():
-    return jsonify({'books': books})
+@auth.login_required
+def get_tasks():
+    return jsonify({'tasks': [make_public_book(books) for books in books]})
 
-#get book by id
 
 @app.route('/books/<int:book_id>', methods=['GET'])
 def get_book(book_id):
@@ -65,5 +98,6 @@ def delete_task(book_id):
     book = [book for book in books if book['id'] == book_id]
     books.remove(book[0])
     return jsonify({'result': True})
+
 if __name__ == "__main__":
     app.run(debug=True)
