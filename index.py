@@ -59,8 +59,8 @@ def make_public_book(books):
 #get all books
 @app.route('/api/books', methods=['GET'])
 @auth.login_required
-def get_tasks():
-    return jsonify({'tasks': [make_public_book(books) for books in books]})
+def get_books():
+    return jsonify({'books': [make_public_book(books) for books in books]})
 
 
 @app.route('/api/books/<int:book_id>', methods=['GET'])
@@ -72,6 +72,7 @@ def get_book(book_id):
 
 #add  book
 @app.route('/api/books', methods=['POST'])
+@auth.login_required
 def add_book():
     book = {
 	       'id': request.json['id'],
@@ -84,6 +85,7 @@ def add_book():
     return jsonify({'book': book}), 201
 #update a book
 @app.route('/api/books/<int:book_id>', methods=['PUT'])
+@auth.login_required
 def update_book(book_id):
     book = [book for book in books if book['id'] == book_id]
     book[0]['id'] = request.json.get('id', book[0]['id'])
