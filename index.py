@@ -57,13 +57,13 @@ def make_public_book(books):
             new_book[field] = books[field]
     return new_book
 #get all books
-@app.route('/books', methods=['GET'])
+@app.route('/api/books', methods=['GET'])
 @auth.login_required
 def get_tasks():
     return jsonify({'tasks': [make_public_book(books) for books in books]})
 
 
-@app.route('/books/<int:book_id>', methods=['GET'])
+@app.route('/api/books/<int:book_id>', methods=['GET'])
 def get_book(book_id):
     book = [book for book in books if book["id"] == book_id]
     if len(book) == 0:
@@ -71,7 +71,7 @@ def get_book(book_id):
     return jsonify({'books': books[0]})
 
 #add  book
-@app.route('/books', methods=['POST'])
+@app.route('/api/books', methods=['POST'])
 def add_book():
     book = {
 	       'id': request.json['id'],
@@ -83,7 +83,7 @@ def add_book():
     books.append(book)
     return jsonify({'book': book}), 201
 #update a book
-@app.route('/books/<int:book_id>', methods=['PUT'])
+@app.route('/api/books/<int:book_id>', methods=['PUT'])
 def update_book(book_id):
     book = [book for book in books if book['id'] == book_id]
     book[0]['id'] = request.json.get('id', book[0]['id'])
@@ -93,7 +93,7 @@ def update_book(book_id):
     book[0]['quantity'] = request.json.get('quantity', book[0]['quantity'])
     return jsonify({'book': book[0]})
 
-@app.route('/books/<int:book_id>', methods=['DELETE'])
+@app.route('/api/books/<int:book_id>', methods=['DELETE'])
 def delete_task(book_id):
     book = [book for book in books if book['id'] == book_id]
     books.remove(book[0])
