@@ -40,7 +40,7 @@ books = [
         "quantity": 18
     }
     ]
-class HelloBooksALLAPI(Resource):
+class HelloBooksallAPI(Resource):
     decorators = [auth.login_required]
 
     def __init__(self):
@@ -57,9 +57,9 @@ class HelloBooksALLAPI(Resource):
         self.reqparse.add_argument('category', type=str, default="",
                                    location='json')
         self.reqparse.add_argument('quantity', type=int, default="",
-                                    help="quantity of books"
+                                    help="quantity of books",
                                    location='json')
-        super(HelloBooksAPI, self).__init__()
+        super(HelloBooksallAPI, self).__init__()
 
     def get_book(self):
         return {'books': [marshal(book, book_fields) for book in books]}
@@ -76,7 +76,7 @@ class HelloBooksALLAPI(Resource):
         books.append(book)
         return {'book': marshal(book, book_fields)}, 201
 
-api.add_resource(HelloBooksAPI, '/books', endpoint='books')
+api.add_resource(HelloBooksallAPI, '/books', endpoint='books')
 
 
 class HelloBooksidAPI(Resource):
@@ -96,9 +96,9 @@ class HelloBooksidAPI(Resource):
         self.reqparse.add_argument('category', type=str, default="",
                                    location='json')
         self.reqparse.add_argument('quantity', type=int, default="",
-                                    help="quantity of books"
+                                    help="quantity of books",
                                    location='json')
-        super(HelloBooksAPI, self).__init__()
+        super(HelloBooksidAPI, self).__init__()
 
     def get(self, id):
         book = [book for book in books if book["id"] == book_id]
@@ -125,8 +125,8 @@ class HelloBooksidAPI(Resource):
         return {'result': True}
 
 
-api.add_resource(HelloBooksAllAPI, '/todo/tasks', endpoint='tasks')
-api.add_resource(HelloBooksidAPI, '/todo/api/v1.0/tasks/<int:id>', endpoint='task')
+api.add_resource(HelloBooksallAPI, '/api/books', endpoint='books')
+api.add_resource(HelloBooksidAPI, '/api/books/<int:id>', endpoint='books')
 
 
 if __name__ == '__main__':
