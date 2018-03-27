@@ -32,6 +32,11 @@ class HelloBook(unittest.TestCase):
         data = json.loads(response_get.get_data())
         self.assertEqual(response_get.status_code,200)
         self.assertEqual(data['books']['bookname'], 'a niggas life')
+        self.assertEqual(data['books']['author'], 'kelvin kiama')
+
+    def test_item_not_exist(self):
+        response = self.app.get('/api/book/9')
+        self.assertEqual(response.status_code, 404)
 
     def test_add_book(self):
         response_add = self.app.post('/api/books',
