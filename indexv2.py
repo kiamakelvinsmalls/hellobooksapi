@@ -69,9 +69,10 @@ class HelloBooksallAPI(Resource):
                                    location='json')
         super(HelloBooksallAPI, self).__init__()
 
-  
+    def get(self):
+        return {'books': [marshal(book, book_fields) for book in books]}
 
-    def add_book(self):
+    def post(self):
         args = self.reqparse.parse_args()
         book = {
             'id': args['id'],
@@ -83,7 +84,6 @@ class HelloBooksallAPI(Resource):
         books.append(book)
         return {'book': marshal(book, book_fields)}, 201
 
-api.add_resource(HelloBooksallAPI, '/api/books', endpoint='books')
 
 
 class HelloBooksidAPI(Resource):
@@ -132,7 +132,7 @@ class HelloBooksidAPI(Resource):
         return {'result': True}
 
 
-# api.add_resource(HelloBooksallAPI, '/api/books', endpoint='books')
+api.add_resource(HelloBooksallAPI, '/api/books', endpoint='books')
 api.add_resource(HelloBooksidAPI, '/api/books/<int:id>', endpoint='book')
 
 
