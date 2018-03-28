@@ -40,8 +40,16 @@ books = [
         "quantity": 18
     }
     ]
+
+book_fields = {
+    'bookname': fields.String,
+    'author': fields.String,
+    'category': fields.String,
+    'quantity': fields.Integer,
+    'uri': fields.Url('book')
+}
 class HelloBooksallAPI(Resource):
-    decorators = [auth.login_required]
+    # decorators = [auth.login_required]
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -61,8 +69,7 @@ class HelloBooksallAPI(Resource):
                                    location='json')
         super(HelloBooksallAPI, self).__init__()
 
-    def get_book(self):
-        return {'books': [marshal(book, book_fields) for book in books]}
+  
 
     def add_book(self):
         args = self.reqparse.parse_args()
@@ -76,11 +83,11 @@ class HelloBooksallAPI(Resource):
         books.append(book)
         return {'book': marshal(book, book_fields)}, 201
 
-api.add_resource(HelloBooksallAPI, '/books', endpoint='books')
+api.add_resource(HelloBooksallAPI, '/api/books', endpoint='books')
 
 
 class HelloBooksidAPI(Resource):
-    decorators = [auth.login_required]
+    # decorators = [auth.login_required]
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -101,13 +108,13 @@ class HelloBooksidAPI(Resource):
         super(HelloBooksidAPI, self).__init__()
 
     def get(self, id):
-        book = [book for book in books if book["id"] == book_id]
+        book = [book for book in books if book["id"] == id]
         if len(book) == 0:
             abort(404)
         return {'book': marshal(book[0], book_fields)}
 
     def put(self, id):
-        book = [book for book in books if book['id'] == book_id]
+        book = [book for book in books if book['id'] == id]
         if len(book) == 0:
             abort(404)
         book = book[0]
@@ -118,15 +125,15 @@ class HelloBooksidAPI(Resource):
         return {'book': marshal(book, book_fields)}
 
     def delete(self, id):
-        book = [book for book in books if book['id'] == book_id]
+        book = [book for book in books if book['id'] == id]
         if len(book) == 0:
             abort(404)
         books.remove(book[0])
         return {'result': True}
 
 
-api.add_resource(HelloBooksallAPI, '/api/books', endpoint='books')
-api.add_resource(HelloBooksidAPI, '/api/books/<int:id>', endpoint='books')
+# api.add_resource(HelloBooksallAPI, '/api/books', endpoint='books')
+api.add_resource(HelloBooksidAPI, '/api/books/<int:id>', endpoint='book')
 
 
 if __name__ == '__main__':

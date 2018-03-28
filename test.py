@@ -45,6 +45,7 @@ class HelloBook(unittest.TestCase):
         self.assertEqual(response_add.status_code, 201)
 
     def test_update(self):
+        books={"quantity":30}
         response_update = self.app.put("api/books/63",
                                 data=json.dumps(books),
                                 content_type='application/json')
