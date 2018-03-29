@@ -1,6 +1,6 @@
 # class of unittests
 import unittest
-from app import app
+from .app.app import app
 from model import Books,books
 import json
 class HelloBook(unittest.TestCase):
