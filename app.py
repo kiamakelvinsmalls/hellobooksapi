@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, abort, request, url_for,make_response,redirect
 from flask_bootstrap import Bootstrap
 from flask_httpauth import HTTPBasicAuth
+from model import Books,books
 app = Flask(__name__,static_url_path="")
 Bootstrap(app)
 
@@ -43,83 +44,54 @@ def bad_request(error):
 @app.errorhandler(404)
 def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
-
-
-books = [
-    {
-        "id":1,
-        "bookname":"a niggas life",
-        "author":"kelvin kiama",
-        "category":"drama,action",
-        "quantity":10
-    },
-    {
-        "id":2,
-        "bookname":"life in the hood",
-        "author":"kelvin kiama",
-        "category":"drama,action",
-        "quantity":10
-    },
-    {
-        "author": "kelvin",
-        "bookname": "A NIGGA GO TO DO WHAT HAS TO BE DONE",
-        "category": "historical",
-        "id": 63,
-        "quantity": 18
-    }
-    ]
-#get all books
-def make_public_book(books):
-    new_book = {}
-    for field in books:
-        if field == 'id':
-            new_book['uri'] = url_for('get_book', book_id=books['id'], _external=True)
-        else:
-            new_book[field] = books[field]
-    return new_book
+lib=Books(books)
 #get all books
 @app.route('/api/books', methods=['GET'])
 def get_books():
-    return jsonify({'books': [make_public_book(books) for books in books]})
+    return jsonify(lib.get_all()),200
 
 
 @app.route('/api/books/<int:book_id>', methods=['GET'])
 def get_book(book_id):
-    book = [book for book in books if book["id"] == book_id]
-    if len(book) == 0:
-        abort(404)
-    return jsonify({'books': books[0]})
+    return jsonify(lib.get_bookbyid(book_id)),200
 
 #add  book
 @app.route('/api/books', methods=['POST'])
 def add_book():
-    book = {
-	       'id': request.json['id'],
+	new = {
+	       'book_id': request.json['book_id'],
 	       'bookname': request.json['bookname'],
 	       'author': request.json['author'],
 	       'category': request.json['category'],
-	       'quantity': request.json['quantity']
+	       'quantity': request.json['quantity'],
+	       'publication_year':request.json['publication_year']
 	    }
-    books.append(book)
-    return jsonify({'book': book}), 201
-#update a book
+	book_id = new['book_id']
+	bookname=new['bookname']
+	author =new['author']
+	category =new['category']
+	quantity= new['quantity']
+	publication_year=new['publication_year']
+	return jsonify(lib.create_book(book_id,bookname,author,category,quantity,publication_year)),201
+    #update a book
 @app.route('/api/books/<int:book_id>', methods=['PUT'])
 def update_book(book_id):
-    book = [book for book in books if book['id'] == book_id]
-    book[0]['id'] = request.json.get('id', book[0]['id'])
-    book[0]['bookname'] = request.json.get('bookname', book[0]['bookname'])
-    book[0]['author'] = request.json.get('author', book[0]['author'])
-    book[0]['category'] = request.json.get('category', book[0]['category'])
-    book[0]['quantity'] = request.json.get('quantity', book[0]['quantity'])
-    return jsonify({'book': book[0]}),200
-
+	edit = {
+	       'bookname': request.json['bookname'],
+	       'author': request.json['author'],
+	       'category': request.json['category'],
+	       'quantity': request.json['quantity'],
+	       'publication_year':request.json['publication_year']
+	    }
+	bookname=edit['bookname']
+	author =edit['author']
+	category =edit['category']
+	quantity= edit['quantity']
+	publication_year=edit['publication_year']
+	return jsonify(lib.put(bookname,author,category,quantity,publication_year)),200
 @app.route('/api/books/<int:book_id>', methods=['DELETE'])
 def delete_task(book_id):
-    book = [book for book in books if book['id'] == book_id]
-    if len(book) == 0:
-        abort(404)
-    books.remove(book[0])
-    return jsonify({'result': True}),204
+    return jsonify(lib.delete(book_id)),204
 
 if __name__ == "__main__":
     app.run(debug=True)
